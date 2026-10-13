@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tune RT Worship Calculator</title>
+<style>
+:root{--bg:#202124;--metal1:#d7d8d6;--metal2:#aeb0ae;--metal3:#747775;--dark:#171819;--black:#0c0d0e;--purple:#c42bd7;--purple2:#ed4df5;--text:#eee;--muted:#666;--line:#777}
+*{box-sizing:border-box} body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#202124;color:#111;font-family:Arial,Helvetica,sans-serif}.app{width:min(860px,96vw);padding:20px 0}
+.plugin{background:linear-gradient(#cfd0ce,#9fa19f);border:2px solid #575957;border-radius:5px;box-shadow:0 12px 40px #000b,inset 0 1px #f7f7f7;padding:0 10px 10px}
+.topbar{height:31px;background:linear-gradient(#252728,#111213);color:#bbb;border-radius:2px;margin:2px 0 9px;display:flex;align-items:center;padding:0 8px;font-size:9px;letter-spacing:.6px}.topbar .led{width:7px;height:7px;background:var(--purple2);box-shadow:0 0 5px var(--purple2);margin-right:7px}.topbar .spacer{flex:1}.topbar span{margin-left:16px}
+.main{display:grid;grid-template-columns:1fr 1.25fr 1fr;gap:7px;align-items:stretch}.section{background:linear-gradient(#e1e2e0,#b9bbb9);border:1px solid #7b7d7a;padding:8px;box-shadow:inset 0 1px #f8f8f8}.section-title{font-size:8px;font-weight:bold;color:#404240;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}.display{background:#111;color:#eee;border:2px inset #555;border-radius:2px;min-height:37px;display:flex;align-items:center;justify-content:center;font-family:Consolas,monospace;font-size:24px;font-weight:bold;text-shadow:0 0 4px #fff;margin-bottom:8px}.display small{font-size:9px;color:#aaa;margin-left:4px;text-shadow:none;align-self:flex-end;margin-bottom:5px}
+.bpm-input{width:100%;background:#111;color:#eee;border:2px inset #555;border-radius:2px;font:700 24px Consolas,monospace;text-align:center;padding:7px 3px;outline:none}.bpm-input:focus{box-shadow:0 0 0 2px var(--purple)}
+.mode-grid{display:grid;grid-template-columns:1fr;gap:4px}.mode{height:31px;border:1px solid #696b69;background:linear-gradient(#f1f2f0,#b8bab8);box-shadow:inset 0 1px #fff;color:#292b29;font-size:10px;font-weight:bold;cursor:pointer}.mode.active{background:linear-gradient(#d44ae0,#a916b9);color:#fff;border-color:#71127a;box-shadow:inset 0 1px #ff8aff}
+.center{text-align:center;position:relative;min-height:260px}.logo{font-size:11px;font-weight:bold;letter-spacing:1px;color:#303230;margin-bottom:5px}.logo b{color:#7d1687}.pitch-ring{width:145px;height:145px;border-radius:50%;margin:4px auto 9px;background:conic-gradient(from 0deg,#202223,#575958,#181a1b,#666866,#202223);border:5px solid #888a88;box-shadow:inset 0 0 0 7px #1a1c1d,0 2px 2px #555;display:flex;align-items:center;justify-content:center;position:relative}.pitch-ring:before{content:'';position:absolute;width:112px;height:112px;border-radius:50%;border:1px solid #666;background:radial-gradient(circle,#292b2c,#0d0f10)}.bpm-ring-content{position:relative;z-index:2;text-align:center;color:#aaa;font-size:9px;letter-spacing:1px}.bpm-ring-input{width:88px;background:transparent;border:0;outline:0;color:var(--purple2);font:700 34px Consolas,monospace;text-align:center;text-shadow:0 0 8px #a018aa;padding:0}.bpm-ring-input::-webkit-inner-spin-button,.bpm-ring-input::-webkit-outer-spin-button{appearance:none;margin:0}.bpm-ring-input{-moz-appearance:textfield}.tempo-step{width:30px;height:38px;border:1px solid #666;background:linear-gradient(#e8e9e7,#a6a8a6);color:#333;font-size:13px;font-weight:bold;cursor:pointer;box-shadow:inset 0 1px #fff,0 1px 2px #555}.tempo-step:hover{background:linear-gradient(#f5f5f3,#b5b7b5)}.tempo-step:active{transform:translateY(1px)}.tempo-hint{text-align:center;font-size:7px;color:#666;letter-spacing:.6px;margin-bottom:5px}
+.knob-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.knob-box{text-align:center}.knob{width:70px;height:70px;border-radius:50%;margin:4px auto 3px;background:radial-gradient(circle at 35% 30%,#f4f5f3 0,#c9cbc9 35%,#777a77 68%,#414341 100%);border:2px solid #5e605e;box-shadow:0 2px 3px #555,inset 0 1px 2px #fff;position:relative;cursor:pointer}.knob:after{content:'';position:absolute;left:50%;top:6px;width:3px;height:27px;background:#222;transform-origin:50% 29px;transform:translateX(-50%) rotate(var(--angle,-135deg));border-radius:2px}.knob.small{width:54px;height:54px}.knob.small:after{height:20px;transform-origin:50% 22px}.knob-value{font:700 13px Consolas,monospace;color:#222}.knob-label{font-size:8px;color:#555;text-transform:uppercase;letter-spacing:.5px}
+.reference-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}.reference-box{background:linear-gradient(#c9cbc9,#a9aba9);border:1px solid #858785;padding:5px 4px;text-align:center;color:#676967;box-shadow:inset 0 1px #e9eae8}.reference-box span{display:block;font-size:6.5px;text-transform:uppercase;letter-spacing:.3px;min-height:16px}.reference-box b{display:block;font:700 15px Consolas,monospace;color:#777a78}.reference-box small{font-size:6px;color:#777}.reference-note{text-align:center;font-size:6px;color:#777;margin-top:5px;letter-spacing:.4px}.curve-panel{margin-top:7px;background:linear-gradient(#dfe0de,#b9bbb9);border:1px solid #777;padding:8px;display:grid;grid-template-columns:160px 1fr 120px;gap:12px;align-items:center}.curve-copy{font-size:9px;color:#444}.curve-copy b{display:block;font-size:10px;color:#222;margin-bottom:2px}.curve-scale{height:7px;background:#5b5d5b;border:1px solid #333;position:relative}.curve-scale:before{content:'';position:absolute;left:0;right:0;top:2px;height:1px;background:#aaa}.curve-marker{position:absolute;top:-4px;width:14px;height:14px;border-radius:50%;background:var(--purple);border:2px solid #fff;box-shadow:0 1px 2px #333;transform:translateX(-50%)}
+.go-row{display:flex;justify-content:center;margin:9px 0 2px}.go{width:110px;height:29px;border:1px solid #64106b;background:linear-gradient(#e855ed,#a915b5);color:#fff;font-weight:bold;font-size:11px;letter-spacing:1px;box-shadow:inset 0 1px #ff9cff,0 1px 2px #555;cursor:pointer}.go:active{transform:translateY(1px)}
+.results{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:7px}.result{background:linear-gradient(#dfe0de,#b8bab8);border:1px solid #777;padding:5px;text-align:center}.result .name{font-size:8px;color:#555;text-transform:uppercase;letter-spacing:.6px}.result .num{background:#111;color:#eee;font:700 21px Consolas,monospace;padding:5px 2px;margin-top:4px;text-shadow:0 0 3px #fff}.result .unit{font-size:7px;color:#555;margin-top:2px}.foot{font-size:7px;color:#4e504e;text-align:center;margin-top:7px}.hidden-range{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+@media(max-width:700px){.app{width:min(620px,98vw);padding:8px 0}.main{grid-template-columns:1fr 1fr}.center{grid-column:1/-1;grid-row:1}.left{grid-column:1}.right{grid-column:2}.curve-panel{grid-template-columns:1fr 1.5fr 1fr}.results{grid-template-columns:repeat(4,1fr)}.pitch-ring{width:130px;height:130px}.pitch-ring:before{width:101px;height:101px}.bpm-ring-input{font-size:30px}.plugin{padding:0 6px 8px}.section{padding:7px}}
+@media(max-width:500px){.main{grid-template-columns:1fr}.center,.left,.right{grid-column:1}.right{order:3}.left{order:2}.center{order:1}.results{grid-template-columns:1fr 1fr}.curve-panel{grid-template-columns:1fr}.curve-copy{text-align:center!important}.topbar span{display:none}.tempo-step{width:38px;height:44px}.reference-grid{grid-template-columns:repeat(5,1fr)}.reference-box span{min-height:24px}.reference-box b{font-size:14px}}
+@media(max-width:360px){.reference-grid{grid-template-columns:repeat(2,1fr)}.tempo-control{gap:7px}.pitch-ring{width:118px;height:118px}.pitch-ring:before{width:90px;height:90px}.bpm-ring-input{font-size:27px}.topbar b{font-size:8px}}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="plugin">
+  <div class="topbar"><span class="led"></span><b>BPM → Waves Tune RT Werte</b><div class="spacer"></div><span>PRESET</span><span>CALCULATOR</span><span>1.0</span></div>
+  <div class="main">
+    <div class="section left">
+      <div class="section-title">Character</div>
+      <div class="mode-grid">
+        <button type="button" class="mode active" data-mode="calm">GETRAGEN</button>
+        <button type="button" class="mode" data-mode="mid">MITTEL</button>
+        <button type="button" class="mode" data-mode="upbeat">UPBEAT</button>
+      </div>
+    </div>
+
+    <div class="section center">
+      <div class="logo">BPM CALCULATOR</div>
+      <div class="tempo-control">
+        <button type="button" class="tempo-step up" id="bpmUp" aria-label="BPM erhöhen">▲</button>
+        <div class="pitch-ring" aria-label="BPM Eingabe">
+          <div class="bpm-ring-content">
+            <input id="bpm" class="bpm-ring-input" type="number" min="40" max="220" step="1" value="120" inputmode="numeric" aria-label="BPM">
+            <div>BPM</div>
+          </div>
+        </div>
+        <button type="button" class="tempo-step down" id="bpmDown" aria-label="BPM verringern">▼</button>
+      </div>
+      
+      <div class="knob-row" style="margin-top:22px">
+        <div class="knob-box"><div class="knob small" id="speedKnob" style="--angle:-55deg"></div><div class="knob-value" id="speedMini">38</div><div class="knob-label">Speed ms</div></div>
+        <div class="knob-box"><div class="knob small" id="transitionKnob" style="--angle:-25deg"></div><div class="knob-value" id="transitionMini">75</div><div class="knob-label">Note Transition ms</div></div>
+      </div>
+    </div>
+
+    <div class="section right">
+      <div class="section-title">Curve Intensity</div>
+      <div class="knob" id="curveKnob" role="slider" tabindex="0" aria-valuemin="25" aria-valuemax="125" aria-valuenow="100" aria-label="Kurvenintensität" style="--angle:45deg"></div>
+      <div class="knob-value" style="text-align:center"><span id="curveValue">100</span><span>%</span></div>
+      
+      <div class="section-title">Reference Values</div>
+      <div class="reference-grid">
+        <div class="reference-box"><span>BPM</span><b>120</b><small>BPM</small></div>
+        <div class="reference-box"><span>Speed</span><b>38</b><small>ms</small></div>
+        <div class="reference-box"><span>Note Transition</span><b>75</b><small>ms</small></div>
+        <div class="reference-box"><span>Tolerance Cents</span><b>5</b><small>cents</small></div>
+        <div class="reference-box"><span>Tolerance Time</span><b>5</b><small>time</small></div>
+      </div>
+      
+    </div>
+  </div>
+
+  <div class="curve-panel">
+    <div class="curve-copy"><b>CURVE RESPONSE</b>Low BPM → smoother<br>High BPM → faster</div>
+    <div class="curve-scale"><div class="curve-marker" id="curveMarker" style="left:75%"></div></div>
+    <div class="curve-copy" style="text-align:right"><b id="preset">VERY SMOOTH</b><span id="tempoOut">120 BPM</span></div>
+  </div>
+
+  <div class="go-row"><button type="button" class="go" id="go">GO</button></div>
+
+  <div class="results">
+    <div class="result"><div class="name">Speed</div><div class="num" id="speed">38</div><div class="unit">ms</div></div>
+    <div class="result"><div class="name">Note Transition</div><div class="num" id="transition">75</div><div class="unit">ms</div></div>
+    <div class="result"><div class="name">Tolerance</div><div class="num" id="cents">5</div><div class="unit">Cents</div></div>
+    <div class="result"><div class="name">Tolerance</div><div class="num" id="time">5</div><div class="unit">Time</div></div>
+  </div>
+  <div class="foot"> for seamless CCM / worship vocals — values are intentionally kept close to the .</div>
+</div>
+</div>
+
+<script>
+const modes={calm:{speedOffset:9,transitionOffset:18,label:'VERY SMOOTH'},mid:{speedOffset:0,transitionOffset:0,label:'BALANCED'},upbeat:{speedOffset:-7,transitionOffset:-13,label:'FAST & CLEAN'}};
+let mode='calm', intensity=100;
+const $=id=>document.getElementById(id), clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+document.querySelectorAll('.mode').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.mode').forEach(b=>b.classList.remove('active'));btn.classList.add('active');mode=btn.dataset.mode;}));
+
+function calculate(bpm){
+  const x=Math.log(bpm/120), k=intensity/100, m=modes[mode];
+  const speed=Math.round(clamp(38-(17*k)*x+m.speedOffset*k,20,70));
+  const transition=Math.round(clamp(75-(27*k)*x+m.transitionOffset*k,38,115));
+  let time=5;if(bpm<70&&mode==='calm')time=6;if(bpm>175&&mode==='upbeat')time=4;
+  return {speed,transition,cents:5,time};
+}
+function knobAngle(v,min,max){return -135+(v-min)/(max-min)*270}
+function updateKnob(){
+  const angle=knobAngle(intensity,25,125);$('curveKnob').style.setProperty('--angle',angle+'deg');$('curveValue').textContent=intensity;$('curveKnob').setAttribute('aria-valuenow',intensity);$('curveMarker').style.left=((intensity-25)/100*100)+'%';
+}
+function setIntensity(v){intensity=Math.round(clamp(v,25,125));updateKnob()}
+let drag=false,lastY=0,dragCarry=0;
+$('curveKnob').addEventListener('pointerdown',e=>{drag=true;lastY=e.clientY;dragCarry=0;$('curveKnob').setPointerCapture(e.pointerId)});
+$('curveKnob').addEventListener('pointermove',e=>{if(!drag)return;const dy=lastY-e.clientY;dragCarry+=dy;const steps=dragCarry>0?Math.floor(dragCarry):Math.ceil(dragCarry);if(steps!==0){setIntensity(intensity+steps);dragCarry-=steps;lastY=e.clientY}});
+$('curveKnob').addEventListener('pointerup',()=>{drag=false;dragCarry=0});$('curveKnob').addEventListener('pointercancel',()=>{drag=false;dragCarry=0});
+$('curveKnob').addEventListener('wheel',e=>{e.preventDefault();setIntensity(intensity+(e.deltaY<0?1:-1))},{passive:false});
+$('curveKnob').addEventListener('keydown',e=>{if(['ArrowUp','ArrowRight'].includes(e.key)){e.preventDefault();setIntensity(intensity+1)}if(['ArrowDown','ArrowLeft'].includes(e.key)){e.preventDefault();setIntensity(intensity-1)}});
+
+function run(){
+ let bpm=Number($('bpm').value);if(!Number.isFinite(bpm))bpm=120;bpm=Math.round(clamp(bpm,40,220));$('bpm').value=bpm;
+ const r=calculate(bpm);$('speed').textContent=r.speed;$('transition').textContent=r.transition;$('cents').textContent=r.cents;$('time').textContent=r.time;$('speedMini').textContent=r.speed;$('transitionMini').textContent=r.transition;$('preset').textContent=modes[mode].label;$('tempoOut').textContent=bpm+' BPM';
+ $('speedKnob').style.setProperty('--angle',knobAngle(r.speed,20,70)+'deg');$('transitionKnob').style.setProperty('--angle',knobAngle(r.transition,38,115)+'deg');
+}
+function stepBpm(delta){let bpm=Number($('bpm').value);if(!Number.isFinite(bpm))bpm=120;bpm=Math.round(clamp(bpm+delta,40,220));$('bpm').value=bpm;run()}
+$('bpmUp').addEventListener('click',()=>stepBpm(1));$('bpmDown').addEventListener('click',()=>stepBpm(-1));
+$('go').addEventListener('click',run);$('bpm').addEventListener('keydown',e=>{if(e.key==='Enter')run()});updateKnob();run();
+</script>
+</body>
+</html>
